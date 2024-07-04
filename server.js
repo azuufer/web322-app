@@ -10,6 +10,18 @@
 * GitHub Repository URL: https://github.com/azuufer/web322-app
 *
 *************************************************************************/
+/*************************************************************************
+* WEB322 – Assignment 3
+* I declare that this assignment is my own work in accordance with Seneca
+* Academic Policy. No part of this assignment has been copied manually or
+* electronically from any other source (including web sites) or
+* distributed to other students.
+*
+* Name: Janipan Sivaguru Student ID: 109601237 Date: July 3rd, 2024
+* Vercel Web App URL:
+* GitHub Repository URL: https://github.com/azuufer/web322-app
+*
+*************************************************************************/
 const express = require('express');
 const path = require('path');
 const app = express();
@@ -17,23 +29,19 @@ const PORT = process.env.PORT || 8080;
 const storeService = require('./store-service');
 
 // Serve static files from the 'public' directory
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Redirect root to /index.html
-app.get('/', (req, res) => {
-  res.redirect('/about.html');
+// Route to serve index.html as the home page
+app.get('/', async (req, res) => {
+  await res.sendFile(path.join(__dirname, 'views', 'index.html'));
 });
 
-// Serve index.html as the home page
-app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/index.html'));
+// Route to serve about.html
+app.get('/about', async (req, res) => {
+  await res.sendFile(path.join(__dirname, 'views', 'about.html'));
 });
 
-// Serve about.html
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/about.html'));
-});
-
+// Route to fetch published items
 app.get('/shop', async (req, res) => {
   try {
     const items = await storeService.getPublishedItems();
@@ -44,7 +52,7 @@ app.get('/shop', async (req, res) => {
   }
 });
 
-// Handle /items route
+// Route to fetch all items
 app.get('/items', async (req, res) => {
   try {
     const items = await storeService.getAllItems();
@@ -55,7 +63,7 @@ app.get('/items', async (req, res) => {
   }
 });
 
-// Handle /categories route
+// Route to fetch categories
 app.get('/categories', async (req, res) => {
   try {
     const categories = await storeService.getCategories();
