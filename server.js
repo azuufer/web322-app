@@ -6,7 +6,7 @@
 * distributed to other students.
 *
 * Name: [Janipan Sivaguru] Student ID: [109601237] Date: [July 3rd,2024]
-* Vercel Web App URL:
+* Vercel Web App URL: https://theecommercers.vercel.app
 * GitHub Repository URL: https://github.com/azuufer/web322-app
 *
 *************************************************************************/
