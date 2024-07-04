@@ -1,91 +1,41 @@
-/*************************************************************************
-* WEB322 – Assignment 3
-* I declare that this assignment is my own work in accordance with Seneca
-* Academic Policy. No part of this assignment has been copied manually or
-* electronically from any other source (including web sites) or
-* distributed to other students.
-*
-* Name: [Janipan Sivaguru] Student ID: [109601237] Date: [July 3rd,2024]
-* Vercel Web App URL:
-* GitHub Repository URL: https://github.com/azuufer/web322-app
-*
-*************************************************************************/
-/*************************************************************************
-* WEB322 – Assignment 3
-* I declare that this assignment is my own work in accordance with Seneca
-* Academic Policy. No part of this assignment has been copied manually or
-* electronically from any other source (including web sites) or
-* distributed to other students.
-*
-* Name: Janipan Sivaguru Student ID: 109601237 Date: July 3rd, 2024
-* Vercel Web App URL:
-* GitHub Repository URL: https://github.com/azuufer/web322-app
-*
-*************************************************************************/
+// app.js
+
 const express = require('express');
 const path = require('path');
 const app = express();
-const PORT = process.env.PORT || 8080;
-const storeService = require('./store-service');
 
-// Serve static files from the 'public' directory
+// Middleware to serve static files
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Route to serve index.html as the home page
-app.get('/', async (req, res) => {
-  await res.sendFile(path.join(__dirname, 'views', 'index.html'));
+// Middleware for parsing JSON bodies
+app.use(express.json());
+
+// Error handling middleware
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
 });
 
-// Route to serve about.html
-app.get('/about', async (req, res) => {
-  await res.sendFile(path.join(__dirname, 'views', 'about.html'));
+// Routes
+app.get('/students', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'students.html'));
 });
 
-// Route to fetch published items
-app.get('/shop', async (req, res) => {
-  try {
-    const items = await storeService.getPublishedItems();
-    res.json(items);
-  } catch (err) {
-    console.error('Error fetching published items:', err);
-    res.status(500).json({ message: 'Failed to fetch published items' });
+app.get('/students/:id', (req, res) => {
+  // Assuming id is a number
+  const id = parseInt(req.params.id);
+  if (isNaN(id)) {
+    // Handle invalid id
+    const error = new Error('Invalid student id');
+    error.status = 400;
+    next(error);
+  } else {
+    res.sendFile(path.join(__dirname, 'public', 'student-details.html'));
   }
 });
 
-// Route to fetch all items
-app.get('/items', async (req, res) => {
-  try {
-    const items = await storeService.getAllItems();
-    res.json(items);
-  } catch (err) {
-    console.error('Error fetching all items:', err);
-    res.status(500).json({ message: 'Failed to fetch all items' });
-  }
+// Start server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
 });
-
-// Route to fetch categories
-app.get('/categories', async (req, res) => {
-  try {
-    const categories = await storeService.getCategories();
-    res.json(categories);
-  } catch (err) {
-    console.error('Error fetching categories:', err);
-    res.status(500).json({ message: 'Failed to fetch categories' });
-  }
-});
-
-// Handle 404 errors
-app.use((req, res) => {
-  res.status(404).send('Page Not Found');
-});
-
-// Initialize the store service and start the server
-storeService.initialize()
-  .then(() => {
-    app.listen(PORT, () => {
-      console.log(`Express http server listening on port ${PORT}`);
-    });
-  })
-  .catch(error => {
-    console.error('Failed to initialize store service:', error);
-  });
