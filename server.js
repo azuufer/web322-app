@@ -5,8 +5,9 @@
 * electronically from any other source (including web sites) or
 * distributed to other students.
 *
-* Name: [Janipan Sivaguru] Student ID: [Your Student ID] Date: [July 3rd,2024]
-*
+* Name: [Janipan Sivaguru] Student ID: [109601237] Date: [July 3rd,2024]
+* Vercel Web App URL:
+* GitHub Repository URL: https://github.com/azuufer/web322-app
 *
 *************************************************************************/
 const express = require('express');
@@ -20,7 +21,7 @@ app.use(express.static('public'));
 
 // Redirect root to /index.html
 app.get('/', (req, res) => {
-  res.redirect('/index.html');
+  res.redirect('/about.html');
 });
 
 // Serve index.html as the home page
