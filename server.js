@@ -38,8 +38,8 @@ app.get('/categories', (req, res) => {
 });
 
 // Serve addItem.html for /items/add route
-app.get('/items/add', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public/addItem.html'));
+app.get('/add', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/add.html'));
 });
 
 // Handle /shop route to get items
