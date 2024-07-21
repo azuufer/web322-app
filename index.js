@@ -1,8 +1,4 @@
-import { v2 as cloudinary } from 'cloudinary';
-
-(async function() {
-
-    // Configuration
+// Configuration
     cloudinary.config({ 
         cloud_name: 'dlflgb81t', 
         api_key: '259968785488515', 

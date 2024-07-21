@@ -5,8 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const storeService = require('./store-service');
 
-
-// Cloudinary
+// Configure Cloudinary
 cloudinary.config({
     cloud_name: 'dlflgb81t',
     api_key: '259968785488515',
