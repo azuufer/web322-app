@@ -1,63 +1,92 @@
 const express = require('express');
 const path = require('path');
-const storeService = require('./store-service'); // Assuming this provides similar functionality to legoData
 const app = express();
 const PORT = process.env.PORT || 8080;
+const storeService = require('./store-service');
 
 // Serve static files from the 'public' directory
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Set view engine to EJS
-app.set('view engine', 'ejs');
-
-// Middleware to parse URL-encoded bodies
-app.use(express.urlencoded({ extended: true }));
-
-// Routes
-app.get('/', async (req, res) => {
-  res.render('home'); // Ensure you have a home.ejs in the views directory
+// Redirect root to /index.html
+app.get('/', (req, res) => {
+  res.redirect('/index.html');
 });
 
-app.get('/about', async (req, res) => {
-  res.render('about'); // Ensure you have an about.ejs in the views directory
+// Serve index.html as the home page
+app.get('/index.html', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
+// Serve about.html
+app.get('/about', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/about.html'));
+});
+
+// Serve shop.html
+app.get('/shop', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/shop.html'));
+});
+
+// Serve items.html
+app.get('/items', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/items.html'));
+});
+
+// Serve categories.html
+app.get('/categories', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public/categories.html'));
+});
+
+// Serve addItem.html for /items/add route
 app.get('/items/add', (req, res) => {
-  res.render('addItem'); // Ensure you have addItem.ejs in the views directory
+  res.sendFile(path.join(__dirname, 'public/addItem.html'));
 });
 
-// Example of getting and rendering items
-app.get('/items', async (req, res) => {
+// Handle /shop route to get items
+app.get('/api/shop', async (req, res) => {
   try {
-    const items = await storeService.getAllItems(); // Replace with actual service method
-    res.render('items', { items }); // Ensure you have items.ejs in the views directory
+    const items = await storeService.getPublishedItems();
+    res.json(items);
   } catch (err) {
-    res.status(500).render('500', { message: `Error fetching items: ${err}` });
+    console.error('Error fetching published items:', err);
+    res.status(500).json({ message: 'Failed to fetch published items' });
   }
 });
 
-// POST route to handle form submission
-app.post('/items/add', async (req, res) => {
+// Handle /items route to get all items
+app.get('/api/items', async (req, res) => {
   try {
-    await storeService.addItem(req.body); // Replace with actual service method
-    res.redirect('/items');
+    const items = await storeService.getAllItems();
+    res.json(items);
   } catch (err) {
-    res.status(500).render('500', { message: `Error adding item: ${err}` });
+    console.error('Error fetching all items:', err);
+    res.status(500).json({ message: 'Failed to fetch all items' });
   }
 });
 
-// Handle other routes
-app.use((req, res, next) => {
-  res.status(404).render('404', { message: "Page not found." });
+// Handle /categories route to get categories
+app.get('/api/categories', async (req, res) => {
+  try {
+    const categories = await storeService.getCategories();
+    res.json(categories);
+  } catch (err) {
+    console.error('Error fetching categories:', err);
+    res.status(500).json({ message: 'Failed to fetch categories' });
+  }
 });
 
-// Initialize store service and start server
+// Handle 404 errors
+app.use((req, res) => {
+  res.status(404).send('Page Not Found');
+});
+
+// Initialize the store service and start the server
 storeService.initialize()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`Express http server listening on port ${PORT}`);
     });
   })
-  .catch(err => {
-    console.error(`Failed to initialize store service: ${err}`);
+  .catch(error => {
+    console.error('Failed to initialize store service:', error);
   });
