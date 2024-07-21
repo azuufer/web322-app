@@ -1,83 +1,63 @@
-/*************************************************************************
-* WEB322 – Assignment 3
-* I declare that this assignment is my own work in accordance with Seneca
-* Academic Policy. No part of this assignment has been copied manually or
-* electronically from any other source (including web sites) or
-* distributed to other students.
-*
-* Name: [Janipan Sivaguru] Student ID: [109601237] Date: [July 3rd,2024]
-* Vercel Web App URL: https://theecommercers.vercel.app
-* GitHub Repository URL: https://github.com/azuufer/web322-app
-*
-*************************************************************************/
 const express = require('express');
 const path = require('path');
+const storeService = require('./store-service'); // Assuming this provides similar functionality to legoData
 const app = express();
 const PORT = process.env.PORT || 8080;
-const storeService = require('./store-service');
 
 // Serve static files from the 'public' directory
-app.use(express.static('public'));
+app.use(express.static(path.join(__dirname, 'public')));
 
-// Redirect root to /index.html
-app.get('/', (req, res) => {
-  res.redirect('/index.html');
+// Set view engine to EJS
+app.set('view engine', 'ejs');
+
+// Middleware to parse URL-encoded bodies
+app.use(express.urlencoded({ extended: true }));
+
+// Routes
+app.get('/', async (req, res) => {
+  res.render('home'); // Ensure you have a home.ejs in the views directory
 });
 
-// Serve index.html as the home page
-app.get('/index.html', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/index.html'));
+app.get('/about', async (req, res) => {
+  res.render('about'); // Ensure you have an about.ejs in the views directory
 });
 
-// Serve about.html
-app.get('/about', (req, res) => {
-  res.sendFile(path.join(__dirname, 'views/about.html'));
+app.get('/items/add', (req, res) => {
+  res.render('addItem'); // Ensure you have addItem.ejs in the views directory
 });
 
-app.get('/shop', async (req, res) => {
-  try {
-    const items = await storeService.getPublishedItems();
-    res.json(items);
-  } catch (err) {
-    console.error('Error fetching published items:', err);
-    res.status(500).json({ message: 'Failed to fetch published items' });
-  }
-});
-
-// Handle /items route
+// Example of getting and rendering items
 app.get('/items', async (req, res) => {
   try {
-    const items = await storeService.getAllItems();
-    res.json(items);
+    const items = await storeService.getAllItems(); // Replace with actual service method
+    res.render('items', { items }); // Ensure you have items.ejs in the views directory
   } catch (err) {
-    console.error('Error fetching all items:', err);
-    res.status(500).json({ message: 'Failed to fetch all items' });
+    res.status(500).render('500', { message: `Error fetching items: ${err}` });
   }
 });
 
-// Handle /categories route
-app.get('/categories', async (req, res) => {
+// POST route to handle form submission
+app.post('/items/add', async (req, res) => {
   try {
-    const categories = await storeService.getCategories();
-    res.json(categories);
+    await storeService.addItem(req.body); // Replace with actual service method
+    res.redirect('/items');
   } catch (err) {
-    console.error('Error fetching categories:', err);
-    res.status(500).json({ message: 'Failed to fetch categories' });
+    res.status(500).render('500', { message: `Error adding item: ${err}` });
   }
 });
 
-// Handle 404 errors
-app.use((req, res) => {
-  res.status(404).send('Page Not Found');
+// Handle other routes
+app.use((req, res, next) => {
+  res.status(404).render('404', { message: "Page not found." });
 });
 
-// Initialize the store service and start the server
+// Initialize store service and start server
 storeService.initialize()
   .then(() => {
     app.listen(PORT, () => {
-      console.log(`Express http server listening on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
-  .catch(error => {
-    console.error('Failed to initialize store service:', error);
+  .catch(err => {
+    console.error(`Failed to initialize store service: ${err}`);
   });
