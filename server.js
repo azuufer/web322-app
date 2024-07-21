@@ -5,6 +5,11 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const storeService = require('./store-service');
 
+const multer = require("multer");
+const cloudinary = require('cloudinary').v2
+const streamifier = require('streamifier')
+
+
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
