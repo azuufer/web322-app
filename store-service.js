@@ -35,9 +35,36 @@ async function getCategories() {
   return Array.from(categories);
 }
 
+async function addItem(itemData) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      // Ensure the items are initialized
+      await initialize();
+      
+      // Set the published property
+      itemData.published = itemData.published !== undefined ? itemData.published : false;
+
+      // Set the id property
+      itemData.id = items.length + 1;
+
+      // Push the new item into the items array
+      items.push(itemData);
+
+      // Save the updated items array to the JSON file
+      await fs.writeFile(path.join(__dirname, 'data/items.json'), JSON.stringify(items, null, 2), 'utf8');
+
+      // Resolve the promise with the new item data
+      resolve(itemData);
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 module.exports = {
   initialize,
   getAllItems,
   getPublishedItems,
-  getCategories
+  getCategories,
+  addItem // Export the addItem function
 };
