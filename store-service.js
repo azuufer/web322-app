@@ -61,10 +61,61 @@ async function addItem(itemData) {
   });
 }
 
+async function getItemsByCategory(category) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await initialize();
+      const filteredItems = items.filter(item => item.category == category);
+      if (filteredItems.length > 0) {
+        resolve(filteredItems);
+      } else {
+        reject('no results returned');
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+async function getItemsByMinDate(minDateStr) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await initialize();
+      const filteredItems = items.filter(item => new Date(item.postDate) >= new Date(minDateStr));
+      if (filteredItems.length > 0) {
+        resolve(filteredItems);
+      } else {
+        reject('no results returned');
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
+async function getItemById(id) {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await initialize();
+      const item = items.find(item => item.id == id);
+      if (item) {
+        resolve(item);
+      } else {
+        reject('no result returned');
+      }
+    } catch (error) {
+      reject(error);
+    }
+  });
+}
+
 module.exports = {
   initialize,
   getAllItems,
   getPublishedItems,
   getCategories,
-  addItem // Export the addItem function
+  addItem,
+  getItemsByCategory,
+  getItemsByMinDate,
+  getItemById
 };
