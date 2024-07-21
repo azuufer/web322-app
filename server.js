@@ -78,6 +78,3 @@ storeService.initialize()
   .catch(error => {
     console.error('Failed to initialize store service:', error);
   });
-app.listen(port, () => {
-    console.log(`Server running on port ${port}`);
-});
