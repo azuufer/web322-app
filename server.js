@@ -5,13 +5,6 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const storeService = require('./store-service');
 
-// Configure Cloudinary
-cloudinary.config({
-    cloud_name: 'dlflgb81t',
-    api_key: '259968785488515',
-    api_secret: 'OvwpAptbqIvKavVN6wJSJc7PdTM'
-});
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
