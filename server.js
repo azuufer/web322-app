@@ -5,11 +5,6 @@ const app = express();
 const PORT = process.env.PORT || 8080;
 const storeService = require('./store-service');
 
-const multer = require("multer");
-const cloudinary = require('cloudinary').v2
-const streamifier = require('streamifier')
-
-
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('/', (req, res) => {
@@ -83,3 +78,55 @@ storeService.initialize()
   .catch(error => {
     console.error('Failed to initialize store service:', error);
   });
+// Route to handle adding a new item
+app.post('/items/add', upload.single('featureImage'), async (req, res) => {
+    if (req.file) {
+        let streamUpload = (req) => {
+            return new Promise((resolve, reject) => {
+                let stream = cloudinary.uploader.upload_stream(
+                    (error, result) => {
+                        if (result) {
+                            resolve(result);
+                        } else {
+                            reject(error);
+                        }
+                    }
+                );
+
+                streamifier.createReadStream(req.file.buffer).pipe(stream);
+            });
+        };
+
+        async function upload(req) {
+            let result = await streamUpload(req);
+            console.log(result);
+            return result;
+        }
+
+        upload(req).then((uploaded) => {
+            processItem(uploaded.url);
+        }).catch((error) => {
+            console.error(error);
+            res.status(500).send('Failed to upload image.');
+        });
+    } else {
+        processItem("");
+    }
+
+    function processItem(imageUrl) {
+        // Adding imageUrl to req.body
+        req.body.featureImage = imageUrl;
+
+        // TODO: Process req.body and add it as a new Item
+        // This is where you would typically save the item to a database
+        console.log('Item data:', req.body);
+
+        // Simulate adding the item to a database and redirect
+        // Replace this with your actual database logic
+        res.redirect('/items');
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
