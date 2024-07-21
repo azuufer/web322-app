@@ -1,48 +1,50 @@
+
 const express = require('express');
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 8080;
 const storeService = require('./store-service');
+const multer = require("multer");
+const cloudinary = require('cloudinary').v2;
+const streamifier = require('streamifier');
 
-// Serve static files from the 'public' directory
+// Cloudinary
+cloudinary.config({
+    cloud_name: 'dlflgb81t',
+    api_key: '259968785488515',
+    api_secret: 'OvwpAptbqIvKavVN6wJSJc7PdTM'
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Redirect root to /index.html
 app.get('/', (req, res) => {
   res.redirect('/index.html');
 });
 
-// Serve index.html as the home page
 app.get('/index.html', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/index.html'));
 });
 
-// Serve about.html
 app.get('/about', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/about.html'));
 });
 
-// Serve shop.html
 app.get('/shop', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/shop.html'));
 });
 
-// Serve items.html
 app.get('/items', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/items.html'));
 });
 
-// Serve categories.html
 app.get('/categories', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/categories.html'));
 });
 
-// Serve addItem.html for /items/add route
 app.get('/add', (req, res) => {
   res.sendFile(path.join(__dirname, 'public/add.html'));
 });
 
-// Handle /shop route to get items
 app.get('/api/shop', async (req, res) => {
   try {
     const items = await storeService.getPublishedItems();
@@ -53,7 +55,6 @@ app.get('/api/shop', async (req, res) => {
   }
 });
 
-// Handle /items route to get all items
 app.get('/api/items', async (req, res) => {
   try {
     const items = await storeService.getAllItems();
@@ -64,7 +65,6 @@ app.get('/api/items', async (req, res) => {
   }
 });
 
-// Handle /categories route to get categories
 app.get('/api/categories', async (req, res) => {
   try {
     const categories = await storeService.getCategories();
@@ -75,12 +75,10 @@ app.get('/api/categories', async (req, res) => {
   }
 });
 
-// Handle 404 errors
 app.use((req, res) => {
   res.status(404).send('Page Not Found');
 });
 
-// Initialize the store service and start the server
 storeService.initialize()
   .then(() => {
     app.listen(PORT, () => {
